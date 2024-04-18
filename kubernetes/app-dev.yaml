@@ -1,68 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: brd-create-stream-consumer-airship-rebuild
-  name: brd-create-stream-consumer-airship-rebuild
-  namespace: belkqa
+  name: hello-world-deployment
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      app: brd-create-stream-consumer-airship-rebuild
-  strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
+      app: hello-world
   template:
     metadata:
       labels:
-        app: brd-create-stream-consumer-airship-rebuild
+        app: hello-world
     spec:
-      serviceAccountName: brd-qa-ksa
       containers:
-        - image: INIT_IMAGE_NAME
-          imagePullPolicy: IfNotPresent
-          name: brd-create-stream-consumer-airship-rebuild-sha256-1
-          env:
-            - name: SPRING_PROFILES_ACTIVE
-              value: qa
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: brd-create-stream-consumer-airship
-  namespace: belkqa
-data:
-  application.properties: |-
-    app.redis.host=brd.belkqa
-    app.redis.port=12000
-    app.redis.custDbHost=cust-attributes.belkqa
-    app.redis.custDbPort=12002
-    app.redis.timeout=5000
-    app.redis.poolsize=100
-    app.redis.index=loyalty_idx
-    app.redis.pwdCustDb=cust-attributes
-    app.gcp.secret_key_customer_account_info=cust-account-detail
-    app.gcp.secret_key_urban_airship=airship-post
-    app.gcp.secret_key_urban_airship_android=airship-post-android
-    app.gcp.secret_key_urban_airship_ios=airship-post-ios
-    app.gcp.secret_key_urban_airship_rebuild=airship-post-android-rebuild
-    app.gcp.secret_key_urban_airship_android_rebuild=airship-post-android-rebuild-app
-    app.gcp.secret_key_urban_airship_ios_rebuild=airship-post-ios-rebuild-app
-    app.gcp.secret_version=latest
-    app.otherProps.secret_refresh_delay_ms=3000
-    app.otherProps.secret_cache_ttl_hrs=12
-    app.otherProps.secret_cache_ON=true
-    app.otherProps.consumer_group_rebuild=brd-create-push-notifications-consumer-rebuild-group
-    app.otherProps.consumer_name_rebuild=brd-create-push-notifications-consumer-rebuild
-    app.otherProps.consumer_group=brd-create-push-notifications-consumer-group
-    app.otherProps.consumer_name=brd-create-push-notifications-consumer
-    app.otherProps.stream_key=brd-ingest-service-stream
-    app.otherProps.customer_account_url=http://34.75.205.133:80/cust/accountInfo
-    app.otherProps.urban_airship_url=https://go.urbanairship.com/api/push
-    app.otherProps.stream_size=300000
-    app.otherProps.resize_interval=600000
-    spring.enable.scheduling=true
-    environment=PROD
+      - name: hello-world-container
+        image: $PROJECT_ID/hello:latest
+        ports:
+        - containerPort: 8080
