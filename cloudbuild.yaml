@@ -1,33 +1,16 @@
 steps:
-  # Step 1: Checkout the source code from your repository
-  
-  - name: 'gcr.io/cloud-builders/git'
-    args: ['clone', '--single-branch', '--branch', 'main', 'https://github.com/jganthakoru/gcp.git']
- 
-  # Step 2: Build the Spring Boot application using Maven
-  
-  - name: 'maven:3.6.3-jdk-11'
+  - name: maven:3.6.0-jdk-11-slim
     entrypoint: 'mvn'
-    args: ['clean', 'install']
- 
-  # Step 3: Build a Docker image containing the Spring Boot application
-  
+    args: ['clean', 'install', '-DskipTests']
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/hello', '.']
- 
-  # Step 4: Push the Docker image to Google Container Registry (GCR)
-  
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/hello']
-    logging: CLOUD_LOGGING_ONLY
-   
-  # Step 5: (Optional) Perform additional deployment steps such as applying Kubernetes manifests, running migrations, etc.
-  
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/hello', '.']   
+  # Update Image Tags
+  - id: 'Setting Init Image Tag'
+    name: ubuntu
+    args: ['bash','-c','sed -i "s,INIT_IMAGE_NAME,gcr.io/$PROJECT_ID/hello," kubernetes/app-dev.yaml']
   - name: 'gcr.io/cloud-builders/kubectl'
-    args: ['apply', '-f', 'kubernetes/app_dev.yaml', '--validate=false']
+    args: ['apply', '-f', 'kubernetes/app-dev.yaml', '--validate=false']
     env:
-      - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=app-services-cluster'
-  
-  # Step6 Images produced by the build
+    - 'CLOUDSDK_COMPUTE_ZONE=us-east1'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=redis-services-cluster'
 images: ['gcr.io/$PROJECT_ID/hello']
