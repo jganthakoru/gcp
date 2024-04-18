@@ -1,0 +1,16 @@
+steps:
+  - name: maven:3.6.0-jdk-11-slim
+    entrypoint: 'mvn'
+    args: ['clean', 'install', '-DskipTests']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/brd-create-stream-consumer-airship-rebuild:$COMMIT_SHA', '.']   
+  # Update Image Tags
+  - id: 'Setting Init Image Tag'
+    name: ubuntu
+    args: ['bash','-c','sed -i "s,INIT_IMAGE_NAME,gcr.io/$PROJECT_ID/brd-create-stream-consumer-airship-rebuild:$COMMIT_SHA," kubernetes/brd-create-stream-consumer-airship_rebuild_qa.yaml']
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'kubernetes/brd-create-stream-consumer-airship_rebuild_qa.yaml', '--validate=false']
+    env:
+    - 'CLOUDSDK_COMPUTE_ZONE=us-east1'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=redis-services-cluster'
+images: ['gcr.io/$PROJECT_ID/brd-create-stream-consumer-airship-rebuild:$COMMIT_SHA']
