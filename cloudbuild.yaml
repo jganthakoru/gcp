@@ -19,10 +19,8 @@ steps:
   
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/$PROJECT_ID/hello']
-  -  options:
+    options:
     logging: CLOUD_LOGGING_ONLY
-    substitution_option: ALLOW_LOOSE
-    machineType: 'N1_HIGHCPU_8'
    
   # Step 5: (Optional) Perform additional deployment steps such as applying Kubernetes manifests, running migrations, etc.
   
