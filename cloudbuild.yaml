@@ -21,6 +21,9 @@ steps:
     args: ['push', 'gcr.io/$PROJECT_ID/hello']
     options:
     logging: CLOUD_LOGGING_ONLY
+    substitution_option: ALLOW_LOOSE
+    machineType: 'N1_HIGHCPU_8'
+    logsBucket: 'my-logs-bucket'
   # Step 5: (Optional) Perform additional deployment steps such as applying Kubernetes manifests, running migrations, etc.
   
   - name: 'gcr.io/cloud-builders/kubectl'
